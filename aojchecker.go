@@ -1,4 +1,4 @@
-package main
+package aojchecker
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func (r *Record) String() string {
 	return fmt.Sprintf("Rank:%v, UserName:%v, Date:%v, Language:%v, Version:%v, CPUMemory:%v", r.Rank, r.UserName, r.Date, r.Language, r.Version, r.CPUMemory)
 }
 
-func (r Records) hasUser(userName string) (exists bool) {
+func (r Records) HasUser(userName string) (exists bool) {
 	for _, record := range r {
 		if userName == record.UserName {
 			return true
@@ -30,12 +30,12 @@ func (r Records) hasUser(userName string) (exists bool) {
 	return false
 }
 
-func getDoc(id string) (doc *goquery.Document, err error) {
+func GetDoc(id string) (doc *goquery.Document, err error) {
 	doc, err = goquery.NewDocument(fmt.Sprintf("http://judge.u-aizu.ac.jp/onlinejudge/problem_statistics.jsp?id=%v#1", id))
 	return doc, err
 }
 
-func parseRecords(doc *goquery.Document) (r Records) {
+func ParseRecords(doc *goquery.Document) (r Records) {
 	filterUser := func(i int, s *goquery.Selection) {
 		if i == 0 {
 			return
@@ -58,20 +58,4 @@ func parseRecords(doc *goquery.Document) (r Records) {
 	s.Find("tr").Each(filterUser)
 
 	return r
-}
-
-func main() {
-	// interesting example
-	id := "ALDS1_5_A"
-	userList := []string{"sotetsuk", "nishimuuuuuu", "ryof", "chiiia12", "kikunantoka", "a_Higu", "smochi", "sat0yu", "cauchym", "sassan", "akito0107", "non1207"}
-
-	doc, _ := getDoc(id)
-	Records := parseRecords(doc)
-	for _, userName := range userList {
-		if Records.hasUser(userName) {
-			fmt.Println(fmt.Sprintf("solved: %v", userName))
-		} else {
-			fmt.Println(fmt.Sprintf("not yet: %v", userName))
-		}
-	}
 }
